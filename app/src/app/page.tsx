@@ -1,18 +1,17 @@
 "use client";
 
 export default function Home() {
-  async function testAPI() {
+  async function handleClick() {
     const res = await fetch("/api/test");
     const data = await res.json();
-    console.log(data);
-    alert(JSON.stringify(data));
+    alert(data.msg);
   }
 
   return (
     <div style={{ padding: 40 }}>
       <h1 style={{ fontSize: 32 }}>Toonflow Web 前端</h1>
       <button
-        onClick={testAPI}
+        onClick={handleClick}
         style={{
           marginTop: 20,
           padding: "10px 20px",
