@@ -1,0 +1,21 @@
+# dependencies
+app/node_modules/
+app/.next/
+
+# env
+app/.env.local
+app/.env*.local
+
+# build output
+app/out/
+app/build/
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# OS
+.DS_Store
+Thumbs.db
