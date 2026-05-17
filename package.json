@@ -1,9 +1,12 @@
 {
+  "name": "toonflow-root",
+  "version": "1.0.0",
   "private": true,
-  "workspaces": [
-    "app"
-  ],
-  "dependencies": {
-    "@supabase/supabase-js": "^2.105.4"
+  "description": "Toonflow - AI Short Drama Studio",
+  "scripts": {
+    "dev": "cd app && npx --no-install next dev",
+    "build": "cd app && npx --no-install next build",
+    "start": "cd app && npx --no-install next start",
+    "lint": "cd app && npx --no-install next lint"
   }
 }

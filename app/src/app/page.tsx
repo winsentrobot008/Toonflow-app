@@ -1,250 +1,120 @@
+// ============================================================
+// Toonflow - Main Application Page
+// ============================================================
+
 "use client";
 
-import { useState } from "react";
+import React from "react";
+import { useAuthStore } from "@/store/authStore";
+import { Header } from "@/components/layout/Header";
+import { AuthForm } from "@/components/features/AuthForm";
+import { GenerationPanel } from "@/components/features/GenerationPanel";
+import { HistoryPanel } from "@/components/features/HistoryPanel";
 
 export default function Home() {
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
-  const [prompt, setPrompt] = useState("");
-  const [result, setResult] = useState("");
-  const [history, setHistory] = useState([]);
-
-  // AI 优化选项
-  const [model, setModel] = useState("DeepSeek");
-  const [style, setStyle] = useState("写实");
-  const [shotStrategy, setShotStrategy] = useState("远景优先");
-  const [characterConsistency, setCharacterConsistency] = useState("开启");
-  const [sceneStyle, setSceneStyle] = useState("写实");
-  const [quality, setQuality] = useState("普通");
-
-  async function register() {
-    const res = await fetch("/api/register", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ email, password }),
-    });
-    const data = await res.json();
-    alert(data.msg || data.error);
-  }
-
-  async function login() {
-    const res = await fetch("/api/login", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ email, password }),
-    });
-    const data = await res.json();
-    alert(data.msg || data.error);
-  }
-
-  async function generate() {
-    const res = await fetch("/api/generate", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        prompt,
-        model,
-        style,
-        shotStrategy,
-        characterConsistency,
-        sceneStyle,
-        quality,
-      }),
-    });
-    const data = await res.json();
-    setResult(data.result || data.error);
-  }
-
-  async function loadHistory() {
-    const res = await fetch("/api/history");
-    const data = await res.json();
-    setHistory(data.records || []);
-  }
+  const { isAuthenticated, isLoading } = useAuthStore();
 
   return (
-    <div
-      style={{
-        maxWidth: "700px",
-        margin: "40px auto",
-        fontFamily: "sans-serif",
-      }}
-    >
-      <h1>Toonood MVP</h1>
-
-      <h2>注册 / 登录</h2>
-      <input
-        placeholder="Email"
-        value={email}
-        onChange={(e) => setEmail(e.target.value)}
-        style={{ width: "100%", padding: "8px", marginBottom: "8px" }}
-      />
-      <input
-        placeholder="Password"
-        type="password"
-        value={password}
-        onChange={(e) => setPassword(e.target.value)}
-        style={{ width: "100%", padding: "8px", marginBottom: "8px" }}
-      />
-      <button
-        onClick={register}
-        style={{ padding: "10px", marginRight: "10px" }}
-      >
-        注册
-      </button>
-      <button onClick={login} style={{ padding: "10px" }}>
-        登录
-      </button>
-
-      <h2 style={{ marginTop: "40px" }}>AI 文本生成</h2>
-      <textarea
-        placeholder="输入一句话..."
-        value={prompt}
-        onChange={(e) => setPrompt(e.target.value)}
-        style={{ width: "100%", height: "80px", padding: "8px" }}
-      />
-
-      {/* AI 优化选项 */}
-      <div
-        style={{
-          marginTop: "20px",
-          padding: "16px",
-          border: "1px solid #ddd",
-          borderRadius: "8px",
-          background: "#fafafa",
-        }}
-      >
-        <h3 style={{ margin: "0 0 12px 0" }}>AI 优化选项</h3>
-
-        <div style={{ marginBottom: "12px" }}>
-          <label style={{ display: "block", marginBottom: "4px", fontWeight: "bold" }}>
-            模型选择
-          </label>
-          <select
-            value={model}
-            onChange={(e) => setModel(e.target.value)}
-            style={{ width: "100%", padding: "8px" }}
-          >
-            <option>DeepSeek</option>
-            <option>GPT</option>
-            <option>Claude</option>
-            <option>Runway</option>
-            <option>Pika</option>
-            <option>Kling</option>
-          </select>
-        </div>
-
-        <div style={{ marginBottom: "12px" }}>
-          <label style={{ display: "block", marginBottom: "4px", fontWeight: "bold" }}>
-            风格选择
-          </label>
-          <select
-            value={style}
-            onChange={(e) => setStyle(e.target.value)}
-            style={{ width: "100%", padding: "8px" }}
-          >
-            <option>写实</option>
-            <option>二次元</option>
-            <option>赛博朋克</option>
-            <option>国风</option>
-            <option>电影感</option>
-          </select>
-        </div>
-
-        <div style={{ marginBottom: "12px" }}>
-          <label style={{ display: "block", marginBottom: "4px", fontWeight: "bold" }}>
-            分镜策略
-          </label>
-          <select
-            value={shotStrategy}
-            onChange={(e) => setShotStrategy(e.target.value)}
-            style={{ width: "100%", padding: "8px" }}
-          >
-            <option>远景优先</option>
-            <option>特写优先</option>
-            <option>快节奏</option>
-            <option>慢节奏</option>
-          </select>
-        </div>
-
-        <div style={{ marginBottom: "12px" }}>
-          <label style={{ display: "block", marginBottom: "4px", fontWeight: "bold" }}>
-            角色一致性
-          </label>
-          <select
-            value={characterConsistency}
-            onChange={(e) => setCharacterConsistency(e.target.value)}
-            style={{ width: "100%", padding: "8px" }}
-          >
-            <option>开启</option>
-            <option>关闭</option>
-          </select>
-        </div>
-
-        <div style={{ marginBottom: "12px" }}>
-          <label style={{ display: "block", marginBottom: "4px", fontWeight: "bold" }}>
-            场景风格
-          </label>
-          <select
-            value={sceneStyle}
-            onChange={(e) => setSceneStyle(e.target.value)}
-            style={{ width: "100%", padding: "8px" }}
-          >
-            <option>写实</option>
-            <option>插画</option>
-            <option>3D</option>
-            <option>动漫</option>
-          </select>
-        </div>
-
-        <div style={{ marginBottom: "12px" }}>
-          <label style={{ display: "block", marginBottom: "4px", fontWeight: "bold" }}>
-            输出质量
-          </label>
-          <select
-            value={quality}
-            onChange={(e) => setQuality(e.target.value)}
-            style={{ width: "100%", padding: "8px" }}
-          >
-            <option>普通</option>
-            <option>高清</option>
-            <option>电影级</option>
-          </select>
-        </div>
+    <div className="min-h-screen bg-gray-950">
+      {/* Background Effects */}
+      <div className="fixed inset-0 pointer-events-none">
+        <div className="absolute top-0 right-0 w-[500px] h-[500px] bg-purple-500/10 rounded-full blur-[120px] translate-x-1/2 -translate-y-1/2" />
+        <div className="absolute bottom-0 left-0 w-[400px] h-[400px] bg-indigo-500/10 rounded-full blur-[100px] -translate-x-1/3 translate-y-1/3" />
       </div>
 
-      <button
-        onClick={generate}
-        style={{ padding: "10px", marginTop: "10px" }}
-      >
-        生成
-      </button>
+      {/* Header */}
+      <Header />
 
-      {result && (
-        <div
-          style={{ marginTop: "20px", padding: "10px", background: "#f0f0f0" }}
-        >
-          <h3>生成结果：</h3>
-          <p>{result}</p>
+      {/* Main Content */}
+      <main className="relative z-10 max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        {/* Hero Section */}
+        <div className="text-center mb-10">
+          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-purple-500/10 border border-purple-500/20 text-purple-300 text-xs mb-4">
+            <span className="w-1.5 h-1.5 rounded-full bg-purple-400 animate-pulse" />
+            AI-Powered Short Drama Studio
+          </div>
+          <h1 className="text-3xl sm:text-4xl font-bold text-white mb-3">
+            Create Stories with{" "}
+            <span className="bg-clip-text text-transparent bg-gradient-to-r from-purple-400 to-indigo-400">
+              AI Magic
+            </span>
+          </h1>
+          <p className="text-gray-400 max-w-lg mx-auto text-sm sm:text-base">
+            Transform your ideas into compelling animated stories with intelligent
+            scriptwriting, shot planning, and character consistency.
+          </p>
         </div>
-      )}
 
-      <h2 style={{ marginTop: "40px" }}>历史记录</h2>
-      <button onClick={loadHistory} style={{ padding: "10px" }}>
-        查看历史
-      </button>
+        {/* Loading State */}
+        {isLoading && (
+          <div className="flex items-center justify-center py-20">
+            <div className="flex flex-col items-center gap-3">
+              <svg
+                className="animate-spin h-8 w-8 text-purple-500"
+                xmlns="http://www.w3.org/2000/svg"
+                fill="none"
+                viewBox="0 0 24 24"
+              >
+                <circle
+                  className="opacity-25"
+                  cx="12"
+                  cy="12"
+                  r="10"
+                  stroke="currentColor"
+                  strokeWidth="4"
+                />
+                <path
+                  className="opacity-75"
+                  fill="currentColor"
+                  d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+                />
+              </svg>
+              <p className="text-sm text-gray-400">Loading...</p>
+            </div>
+          </div>
+        )}
 
-      {history.length > 0 && (
-        <ul style={{ marginTop: "20px" }}>
-          {history.map((item: any, i: number) => (
-            <li key={i} style={{ marginBottom: "10px" }}>
-              <strong>Prompt:</strong> {item.prompt}<br />
-              <strong>Result:</strong> {item.result}<br />
-              <strong>Options:</strong> {item.model || "DeepSeek"} / {item.style || "写实"} / {item.shotStrategy || "远景优先"} / 角色一致性: {item.characterConsistency || "开启"} / {item.sceneStyle || "写实"} / {item.quality || "普通"}<br />
-              <small>{item.createdAt}</small>
-            </li>
-          ))}
-        </ul>
-      )}
+        {/* Auth Section (when not authenticated) */}
+        {!isAuthenticated && !isLoading && (
+          <div className="mb-12">
+            <AuthForm />
+          </div>
+        )}
+
+        {/* Main App (when authenticated) */}
+        {isAuthenticated && !isLoading && (
+          <div className="space-y-10">
+            {/* Generation Panel */}
+            <section>
+              <GenerationPanel />
+            </section>
+
+            {/* Divider */}
+            <div className="relative">
+              <div className="absolute inset-0 flex items-center">
+                <div className="w-full border-t border-gray-800" />
+              </div>
+              <div className="relative flex justify-center">
+                <span className="px-4 text-xs text-gray-600 bg-gray-950">
+                  HISTORY
+                </span>
+              </div>
+            </div>
+
+            {/* History Panel */}
+            <section>
+              <HistoryPanel />
+            </section>
+          </div>
+        )}
+
+        {/* Footer */}
+        <footer className="mt-16 pb-8 text-center">
+          <p className="text-xs text-gray-600">
+            Toonflow &copy; {new Date().getFullYear()} &mdash; AI Short Drama Studio
+          </p>
+        </footer>
+      </main>
     </div>
   );
 }
