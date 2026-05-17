@@ -1,17 +1,16 @@
 import { NextRequest, NextResponse } from "next/server";
-import { supabase } from "@/lib/supabaseClient";
+import fs from "fs";
+import path from "path";
 
 export async function POST(req: NextRequest) {
-  if (req.method !== "POST") {
-    return NextResponse.json({ error: "Method not allowed" }, { status: 405 });
-  }
-
   const { email, password } = await req.json();
-  const { data, error } = await supabase.auth.signUp({ email, password });
 
-  if (error) {
-    return NextResponse.json({ error: error.message }, { status: 400 });
-  }
+  const filePath = path.join(process.cwd(), "..", "data", "users.json");
+  const raw = fs.readFileSync(filePath, "utf8");
+  const users = JSON.parse(raw);
 
-  return NextResponse.json({ msg: "User registered", data });
+  users.push({ email, password });
+  fs.writeFileSync(filePath, JSON.stringify(users, null, 2));
+
+  return NextResponse.json({ msg: "User registered successfully!" });
 }
