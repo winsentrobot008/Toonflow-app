@@ -1,4 +1,9 @@
 {
   "private": true,
-  "workspaces": ["app"]
+  "workspaces": [
+    "app"
+  ],
+  "dependencies": {
+    "@supabase/supabase-js": "^2.105.4"
+  }
 }
