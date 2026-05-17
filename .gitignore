@@ -5,6 +5,12 @@ app/node_modules/
 # build output
 .next/
 app/.next/
+
+# auto-generated
+*.code-workspace
+next-env.d.ts
+tsconfig.json
+c
 app/out/
 app/build/
 
