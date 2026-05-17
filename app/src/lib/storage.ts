@@ -1,12 +1,17 @@
 import fs from "fs";
 import path from "path";
 
+// In-memory store for Vercel (writable area may be limited in serverless)
+const memoryStore: Record<string, any[]> = {};
+
+function isVercel(): boolean {
+  return process.env.VERCEL === "1";
+}
+
 function getDataDir(): string {
-  // On Vercel, /tmp is the only writable directory
-  if (process.env.VERCEL === "1") {
+  if (isVercel()) {
     return "/tmp/data";
   }
-  // Locally, store data in the project root's data/ directory
   return path.join(process.cwd(), "..", "data");
 }
 
@@ -17,6 +22,14 @@ function ensureDir(dir: string) {
 }
 
 export function readJSON(filename: string): any[] {
+  // On Vercel, use in-memory store to avoid EROFS issues
+  if (isVercel()) {
+    if (!memoryStore[filename]) {
+      memoryStore[filename] = [];
+    }
+    return memoryStore[filename];
+  }
+
   const dir = getDataDir();
   const filePath = path.join(dir, filename);
   ensureDir(dir);
@@ -29,6 +42,12 @@ export function readJSON(filename: string): any[] {
 }
 
 export function writeJSON(filename: string, data: any[]) {
+  // On Vercel, use in-memory store to avoid EROFS issues
+  if (isVercel()) {
+    memoryStore[filename] = data;
+    return;
+  }
+
   const dir = getDataDir();
   const filePath = path.join(dir, filename);
   ensureDir(dir);
